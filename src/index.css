@@ -1,0 +1,122 @@
+@import 'tailwindcss';
+@import './fonts.css';
+
+/*
+ * Bloom's palette. Kept as CSS variables (exposed to Tailwind via @theme) so the
+ * Phase 2 theme picker can swap them at runtime by setting them on :root.
+ */
+@theme {
+  --color-cream: #fdf6ec;
+  --color-cream-deep: #f6e9d8;
+  --color-ink: #3a3129;
+  --color-ink-soft: #7b6c5d;
+  --color-leaf: #5fae68;
+  --color-leaf-deep: #3f8a53;
+  --color-blush: #ff9aa8;
+  --color-sky: #7cc4e8;
+  --color-honey: #ffc94d;
+
+  /* Extra cartoon brights — used by confetti, characters and toys. */
+  --color-grape: #a98cf0;
+  --color-tangerine: #ff9f45;
+  --color-mint: #7fe0c4;
+  --color-bubblegum: #ff7fbf;
+
+  --font-display: 'Baloo 2', 'Trebuchet MS', 'Comic Sans MS', ui-rounded, system-ui, sans-serif;
+  --font-sans: 'Nunito', ui-rounded, 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    /* Prevent iOS auto-zoom weirdness and rubber-band scroll of the shell. */
+    -webkit-text-size-adjust: 100%;
+    height: 100%;
+  }
+
+  body {
+    height: 100%;
+    margin: 0;
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    /* Respect notches / home indicator when installed. */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
+    overscroll-behavior-y: none;
+  }
+
+  #root {
+    min-height: 100%;
+  }
+
+  /* No blue tap flash on iOS. */
+  button,
+  canvas,
+  [role='button'] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  /* Visible focus for keyboard users only. */
+  :focus-visible {
+    outline: 2px solid var(--color-leaf-deep);
+    outline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  /*
+   * Cartoon card: chunky ink outline + hard offset shadow (no blur), which is what
+   * reads as "sticker" rather than "material design". Used by every surface.
+   */
+  .card-soft {
+    background-color: color-mix(in srgb, white 78%, var(--color-cream));
+    border: 3px solid var(--color-ink);
+    box-shadow: 5px 6px 0 0 var(--color-ink);
+  }
+
+  /* Chunky sticker button. Presses "into" the page by eating its own shadow. */
+  .btn-toon {
+    border: 3px solid var(--color-ink);
+    box-shadow: 4px 5px 0 0 var(--color-ink);
+    transition:
+      transform 0.12s ease-out,
+      box-shadow 0.12s ease-out;
+  }
+  .btn-toon:active:not(:disabled) {
+    transform: translate(4px, 5px);
+    box-shadow: 0 0 0 0 var(--color-ink);
+  }
+
+  /* Comic-style text outline, for numbers and shouty headings. */
+  .text-toon {
+    -webkit-text-stroke: 2.5px var(--color-ink);
+    paint-order: stroke fill;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+ * Phase 3 does a full reduced-motion pass; this baseline makes sure the app is
+ * never unusable for someone with the OS setting on today.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

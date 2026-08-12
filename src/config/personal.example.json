@@ -1,0 +1,84 @@
+{
+  "$comment": "Copy this file to src/config/personal.json and edit it. personal.json is gitignored, so your real content never leaves your machine. Every field here is optional — anything you omit falls back to these generic defaults.",
+
+  "personName": "friend",
+  "appTitle": "Bloom",
+  "greeting": "Hey you.",
+
+  "birthdayDate": "01-01",
+
+  "$comment_petNames": "Cute nicknames. A different one greets them on every open, and none repeats until the whole list has been used — so the longer this list, the longer before you hear one twice. Put the real ones here, in your gitignored personal.json.",
+  "petNames": [
+    "babe",
+    "cutie",
+    "sunshine",
+    "sweetpea",
+    "honey",
+    "buttercup",
+    "sugar",
+    "lovely",
+    "darling",
+    "peach"
+  ],
+
+  "compliments": [
+    "You are doing better than you think you are.",
+    "The world is softer because you are in it.",
+    "Someone thought of you today and smiled.",
+    "You are allowed to take up space.",
+    "Your kindness is not a small thing.",
+    "You don't have to earn rest.",
+    "You are more than the hardest day you've had.",
+    "The way you notice small things is a gift.",
+    "You've survived every single thing so far. That counts.",
+    "Being you is enough. It always was."
+  ],
+
+  "gratitudePrompts": [
+    "What made you smile today?",
+    "What's one small thing that went right?",
+    "Who are you glad exists?",
+    "What did your body do for you today?",
+    "What's something you're looking forward to, even slightly?",
+    "What's a sound you liked today?",
+    "What's one thing you'd tell your past self about right now?"
+  ],
+
+  "memories": [
+    {
+      "id": "m1",
+      "caption": "A placeholder memory. Drop your own photo in public/memories/ and point at it here.",
+      "image": null,
+      "gradient": ["#e8a9a0", "#e5bd72"],
+      "date": "Some good day"
+    },
+    {
+      "id": "m2",
+      "caption": "Captions can be as long or as short as you like.",
+      "image": null,
+      "gradient": ["#9dbcd4", "#5b8c5a"],
+      "date": "That one afternoon"
+    },
+    {
+      "id": "m3",
+      "caption": "If image is null, Bloom draws a soft gradient card instead.",
+      "image": null,
+      "gradient": ["#5b8c5a", "#e5bd72"],
+      "date": "Ordinary Tuesday"
+    },
+    {
+      "id": "m4",
+      "caption": "Add as many as you want — the wall just keeps scrolling.",
+      "image": null,
+      "gradient": ["#e5bd72", "#e8a9a0"],
+      "date": "Later that year"
+    },
+    {
+      "id": "m5",
+      "caption": "The small days are the ones worth keeping.",
+      "image": null,
+      "gradient": ["#9dbcd4", "#e8a9a0"],
+      "date": "No idea, but it was nice"
+    }
+  ]
+}
