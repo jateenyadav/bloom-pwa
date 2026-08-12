@@ -18,19 +18,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { experiencePool } from '../experiences/index.js'
 import { useBloomStore } from '../store/useBloomStore.js'
 import { listPhotos, formatBytes } from '../lib/photoStore.js'
-
-/**
- * Resolve the "saved" line for one tile.
- *
- * Kept out of the component so the tile stays a pure render of what it's handed.
- */
-function savedLabel(experience, state, photoCount) {
-  const saves = experience.saves
-  if (!saves) return null
-  const count = saves.async ? photoCount : saves.count?.(state)
-  if (!count) return null
-  return `${count} ${saves.label}`
-}
+import { savedLabel, savedSummary } from '../lib/savedSummary.js'
 
 function Tile({ experience, index, saved, isCurrent, onPick, reduceMotion }) {
   return (
@@ -139,12 +127,9 @@ export default function ExperienceMenu({ currentId, onPick }) {
     setOpen(false)
   }
 
-  const savedTotal =
-    state.gratitude.length +
-    state.wishes.length +
-    state.moods.length +
-    state.capsules.length +
-    photoCount
+  // Derived from the pool, not hand-listed: an experience that remembers something
+  // has to appear here on its own, or this panel quietly under-reports.
+  const summary = savedSummary(experiencePool, state, photoCount)
 
   return (
     <>
@@ -273,20 +258,18 @@ export default function ExperienceMenu({ currentId, onPick }) {
                     Saved on this device
                   </p>
                   <p className="mt-1.5 text-xs font-semibold leading-relaxed text-ink-soft">
-                    {savedTotal === 0 ? (
+                    {summary.length === 0 ? (
                       'Nothing saved yet. Anything you write or add lives only here.'
                     ) : (
                       <>
-                        {state.gratitude.length > 0 && <>{state.gratitude.length} good things · </>}
-                        {state.wishes.length > 0 && <>{state.wishes.length} wishes · </>}
-                        {state.moods.length > 0 && <>{state.moods.length} days planted · </>}
-                        {state.capsules.length > 0 && <>{state.capsules.length} capsules · </>}
-                        {photoCount > 0 && (
-                          <>
-                            {photoCount} photos ({formatBytes(photoBytes)}) ·{' '}
-                          </>
-                        )}
-                        {state.stickers.length > 0 && <>{state.stickers.length} stickers · </>}
+                        {summary.map((part) => (
+                          <span key={part.key}>
+                            {part.text}
+                            {/* Photos are the one thing worth showing a size for. */}
+                            {part.key === 'photos' && ` (${formatBytes(photoBytes)})`}
+                            {' · '}
+                          </span>
+                        ))}
                         <span className="whitespace-nowrap">nothing is uploaded anywhere.</span>
                       </>
                     )}

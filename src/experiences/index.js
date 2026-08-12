@@ -17,7 +17,8 @@
  *   saves     optional. Names the store key this experience remembers, plus how to
  *             count and label it, so the menu can show what's saved without knowing
  *             anything about how the experience works. `count` receives the whole
- *             persisted state.
+ *             persisted state; `one` is the singular label ("1 wish", not "1 wishes").
+ *             Two experiences may share a `key` — the menu's summary counts it once.
  */
 import ComplimentSlotMachine from './ComplimentSlotMachine.jsx'
 import GratitudePrompt from './GratitudePrompt.jsx'
@@ -54,7 +55,7 @@ export const experiencePool = [
     title: 'One small thing',
     glyph: '🫙',
     blurb: 'One good thing about today, kept in a jar.',
-    saves: { key: 'gratitude', label: 'saved', count: (state) => state.gratitude.length },
+    saves: { key: 'gratitude', label: 'good things', one: 'good thing', count: (state) => state.gratitude.length },
   },
   {
     id: 'doodle-pad',
@@ -77,7 +78,7 @@ export const experiencePool = [
     blurb: 'Your own photos, taped up like polaroids.',
     // Photos live in IndexedDB, not the zustand store, so the menu reads their
     // count asynchronously instead of through `count`.
-    saves: { key: 'photos', label: 'photos', async: true },
+    saves: { key: 'photos', label: 'photos', one: 'photo', async: true },
   },
   {
     id: 'wish-jar',
@@ -88,7 +89,7 @@ export const experiencePool = [
     title: 'Wish jar',
     glyph: '⭐️',
     blurb: 'Write a wish on a star and drop it in.',
-    saves: { key: 'wishes', label: 'wishes', count: (state) => state.wishes.length },
+    saves: { key: 'wishes', label: 'wishes', one: 'wish', count: (state) => state.wishes.length },
   },
   {
     id: 'mood-garden',
@@ -99,7 +100,7 @@ export const experiencePool = [
     title: 'Mood garden',
     glyph: '🌷',
     blurb: 'Plant how today feels. Every mood gets a flower.',
-    saves: { key: 'moods', label: 'days planted', count: (state) => state.moods.length },
+    saves: { key: 'moods', label: 'days planted', one: 'day planted', count: (state) => state.moods.length },
   },
   {
     id: 'time-capsule',
@@ -110,7 +111,7 @@ export const experiencePool = [
     title: 'Time capsule',
     glyph: '💌',
     blurb: 'A note to yourself, sealed until later.',
-    saves: { key: 'capsules', label: 'sealed', count: (state) => state.capsules.length },
+    saves: { key: 'capsules', label: 'capsules sealed', one: 'capsule sealed', count: (state) => state.capsules.length },
   },
   {
     id: 'fortune-cookie',
@@ -131,7 +132,7 @@ export const experiencePool = [
     title: 'Need a hug?',
     glyph: '🤗',
     blurb: 'One big button. Press it and get squeezed.',
-    saves: { key: 'hugs', label: 'hugs', count: (state) => state.hugs },
+    saves: { key: 'hugs', label: 'hugs', one: 'hug', count: (state) => state.hugs },
   },
   {
     id: 'bubble-wrap',
@@ -142,7 +143,7 @@ export const experiencePool = [
     title: 'Bubble wrap',
     glyph: '🫧',
     blurb: 'A whole sheet to pop. With the sound.',
-    saves: { key: 'bubblesPopped', label: 'popped', count: (state) => state.bubblesPopped },
+    saves: { key: 'bubblesPopped', label: 'bubbles popped', one: 'bubble popped', count: (state) => state.bubblesPopped },
   },
   {
     id: 'scratch-card',
@@ -163,7 +164,7 @@ export const experiencePool = [
     title: 'Star catcher',
     glyph: '🌟',
     blurb: 'Catch falling stars. Nothing to lose.',
-    saves: { key: 'stickers', label: 'stickers', count: (state) => state.stickers.length },
+    saves: { key: 'stickers', label: 'stickers', one: 'sticker', count: (state) => state.stickers.length },
   },
   {
     id: 'sticker-book',
