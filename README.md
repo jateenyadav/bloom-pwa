@@ -12,6 +12,9 @@ It does two things:
 
 No backend, no accounts, no analytics, no tracking. Everything lives on the device.
 
+**Live demo:** https://jateenyadav.github.io/bloom-pwa/ — running on the generic
+placeholder content, since the personal config is gitignored and never reaches CI.
+
 **This repo is deliberately generic.** There are no names, photos, or personal
 messages in the committed code — all of that comes from a single gitignored config
 file. Fork it and make it about your person.
@@ -40,9 +43,33 @@ out falls back to the generic placeholder in `personal.example.json`.
 | `gratitudePrompts` | Array of prompts, one picked per visit |
 | `memories` | Array of `{ id, caption, image, gradient, date }` for the memory wall |
 
-For photos, drop files in `public/memories/` (also gitignored) and reference them as
-`"image": "memories/your-photo.jpg"`. Entries with `"image": null` render as a soft
-gradient card instead, which is what the open-source placeholders do.
+### Adding your own photos
+
+Two steps, and the photos never leave your machine:
+
+1. Put the image files in `public/memories/` (create the folder — it's gitignored,
+   like `personal.json`, so `git push` can never leak them).
+2. Point at them from `personal.json`, one entry per photo:
+
+```json
+"memories": [
+  { "id": "m1", "image": "memories/beach.jpg", "caption": "That windy afternoon", "date": "June 2024" },
+  { "id": "m2", "image": "memories/cake.jpg",  "caption": "You made this!",       "date": "Last winter" }
+]
+```
+
+The path is relative to `public/`, so `public/memories/beach.jpg` is written as
+`"memories/beach.jpg"` — no leading slash, which is what keeps it working from a
+GitHub Pages subpath.
+
+Entries with `"image": null` render as a soft gradient card using the `gradient`
+colours instead, which is what the committed placeholders do. Any web format works
+(jpg, png, webp); resize huge photos down to ~1200px wide first, since everything
+gets precached for offline use.
+
+Because the images live in the repo folder rather than on a server, they're baked
+into your local `dist/` at build time and cached by the service worker — which is
+why the memory wall still works with no signal.
 
 `personal.json` is loaded via `import.meta.glob`, so the build works fine when it's
 absent — a fresh clone or a CI build just uses the example content.
