@@ -3,12 +3,14 @@
 A small, installable Progressive Web App designed to make one specific person's day
 a little better every time they open it.
 
-It does two things:
+It does three things:
 
 1. **Daily Joy Engine** — every open serves a *different* small joy experience from a
-   rotating pool, so it never feels repetitive.
+   rotating pool of 13, so it never feels repetitive.
 2. **Calm Toolkit** — a one-tap escape hatch with a 4-7-8 breathing exercise and a
    5-4-3-2-1 grounding exercise, reachable from anywhere in the app.
+3. **The menu** — a bottom-left button that opens every experience on demand, plus a
+   summary of everything saved on the device.
 
 No backend, no accounts, no analytics, no tracking. Everything lives on the device.
 
@@ -41,38 +43,86 @@ out falls back to the generic placeholder in `personal.example.json`.
 | `petNames` | Array of cute nicknames. A different one greets them on every open, and none repeats until the whole list has been used — so a longer list means longer before they hear one twice. Sprout uses the same nickname when you tap it. |
 | `compliments` | Array of affirmations for the slot machine |
 | `gratitudePrompts` | Array of prompts, one picked per visit |
-| `memories` | Array of `{ id, caption, image, gradient, date }` for the memory wall |
-
-### Adding your own photos
-
-Two steps, and the photos never leave your machine:
-
-1. Put the image files in `public/memories/` (create the folder — it's gitignored,
-   like `personal.json`, so `git push` can never leak them).
-2. Point at them from `personal.json`, one entry per photo:
-
-```json
-"memories": [
-  { "id": "m1", "image": "memories/beach.jpg", "caption": "That windy afternoon", "date": "June 2024" },
-  { "id": "m2", "image": "memories/cake.jpg",  "caption": "You made this!",       "date": "Last winter" }
-]
-```
-
-The path is relative to `public/`, so `public/memories/beach.jpg` is written as
-`"memories/beach.jpg"` — no leading slash, which is what keeps it working from a
-GitHub Pages subpath.
-
-Entries with `"image": null` render as a soft gradient card using the `gradient`
-colours instead, which is what the committed placeholders do. Any web format works
-(jpg, png, webp); resize huge photos down to ~1200px wide first, since everything
-gets precached for offline use.
-
-Because the images live in the repo folder rather than on a server, they're baked
-into your local `dist/` at build time and cached by the service worker — which is
-why the memory wall still works with no signal.
+| `fortunes` | Array of lines for the fortune cookie. Fortune-shaped ("something you've been waiting on is closer than it looks") reads better here than a compliment. |
+| `memories` | Array of `{ id, caption, gradient, date }` — the gradient cards the memory wall starts with. **No image paths:** photos are added in the app, not in config. |
 
 `personal.json` is loaded via `import.meta.glob`, so the build works fine when it's
 absent — a fresh clone or a CI build just uses the example content.
+
+### Photos: added in the app, never in the repo
+
+**Don't put image files in this repo.** It's public, so a photo committed to
+`public/` is visible to anyone who finds the URL — and a fork of this app should be
+about *your* person, not whoever built it.
+
+Instead, photos are added at runtime, from the device:
+
+1. Open the **Memory wall** (it's in the menu).
+2. Tap **Add a photo** and pick from the camera roll or file picker. Optionally type
+   a caption first and it gets attached to the next photo you pick.
+
+What happens to the file:
+
+- It's drawn to a `<canvas>`, scaled so the long edge is at most 1400px, and
+  re-encoded as JPEG at quality 0.82. That keeps it small — and re-encoding drops the
+  EXIF block, so **GPS coordinates and camera metadata are stripped** on the way in.
+- The resulting Blob is stored in **IndexedDB** (`bloom-photos`), not localStorage —
+  localStorage is string-only and caps around 5MB, so photos would need base64 (a 33%
+  size penalty) and would fill it after two or three pictures.
+- Nothing is uploaded. There is no server to upload to.
+
+So: the photos are on that one device, in that one browser. They survive reloads,
+offline use, and reinstalling the app to the home screen. They do *not* sync to
+another phone, and clearing the browser's site data deletes them. That's the
+tradeoff a no-backend app makes, and it's the reason the app works with no signal.
+
+The memory wall footer shows how many photos are stored and how much space they take.
+Each photo has a **Remove** button in its detail view.
+
+The committed `memories` placeholders have no image at all — they render as soft
+gradient cards, which is what the live demo shows.
+
+## The 13 experiences
+
+Every one is reachable from the menu, and one is served automatically per open.
+
+| | Experience | What it is | Remembers |
+| --- | --- | --- | --- |
+| 🎰 | A reminder | Slot machine that lands on something true about you | — |
+| 🫙 | One small thing | One good thing about today, kept in a jar | your notes |
+| 🖍️ | Doodle pad | Crayon scribbling with stampable stickers | — |
+| 📸 | Memory wall | Your own photos, taped up like polaroids | photos |
+| ⭐️ | Wish jar | Write a wish on a star, drop it in, mark it come true | wishes |
+| 🌷 | Mood garden | Plant how today feels; every mood gets a flower | one flower per day |
+| 💌 | Time capsule | A note to yourself, sealed for a week/month/season | sealed notes |
+| 🥠 | Fortune cookie | Crack it open, read the slip | — |
+| 🤗 | Need a hug? | One big button; press it and get squeezed | hug count |
+| 🫧 | Bubble wrap | A full sheet to pop, with the sound | total popped |
+| 🎟️ | Scratch card | Scratch the foil off to find the message | — |
+| 🌟 | Star catcher | Catch falling stars — no timer, no score, nothing to lose | stickers won |
+| 📖 | Sticker book | Every sticker Star Catcher has given you | 12 to find |
+
+A **heavy day plants a sleepy blue bloom, not a dead one.** Nothing in here has a lose
+condition, a streak to break, or a guilt message — that's a deliberate constraint, not
+an oversight.
+
+The time capsule's lock is honest but not cryptographic: it checks the device clock, so
+changing the date would open it early. Encrypting a note against its author would be
+security theatre for no gain.
+
+## The menu
+
+The bottom-**left** button opens a spring-animated drawer with all 13 experiences and a
+**Saved on this device** panel that counts every collection (wishes, moods, hugs,
+bubbles, stickers, photos, sealed capsules) plus how many distinct days the app has been
+opened.
+
+Picking something from the menu overrides today's experience *for that visit only*. It's
+deliberately not persisted: the rotation has already advanced, so browsing the menu can't
+derail tomorrow's surprise.
+
+The calm button owns the bottom-right corner and sits above the menu (`z-50` vs `z-45`)
+— it must never have to share space or wait its turn.
 
 ## Commands
 
@@ -80,7 +130,7 @@ absent — a fresh clone or a CI build just uses the example content.
 npm run dev       # dev server
 npm run build     # production build to dist/
 npm run preview   # serve the built output (use this to test install/offline)
-npm test          # unit tests for the rotation engine + breathing schedule
+npm test          # 58 unit tests: rotation engine, breathing schedule, store, pool
 npm run icons     # regenerate PWA icons from scripts/generate-icons.mjs
 ```
 
@@ -126,10 +176,20 @@ Write the component, then add one entry to `src/experiences/index.js`:
   weight: 1,
   tags: ['common', 'play'],
   title: 'Bubble wrap',
+  glyph: '🫧',                 // the menu tile
+  blurb: 'A whole sheet to pop. With the sound.',
+  // Optional. Lets the menu report what's saved without knowing how this works.
+  saves: { key: 'bubblesPopped', label: 'popped', count: (state) => state.bubblesPopped },
 }
 ```
 
-Nothing else needs to change.
+Nothing else needs to change — the rotation engine and the menu both read this one
+list. If your experience remembers something, add its key to `useBloomStore`
+(`resetAll` and `partialize` included) and point `saves` at it.
+
+`src/experiences/pool.test.js` enforces the contract: unique ids, every field its four
+consumers need, well-formed `saves` descriptors, and counts that don't throw on a fresh
+empty state.
 
 ### One rule if your experience opens a fullscreen view
 
@@ -149,11 +209,13 @@ skipped. Repeat opens on the same day don't inflate it.
 src/
   engine/          pure, tested logic (rotation, breathing schedule)
   store/           the single persisted zustand store
-  hooks/           useDailyExperience — engine ⇄ storage wiring
-  experiences/     the joy experiences + the pool registry (index.js)
+  hooks/           useDailyExperience, usePhotos (object-URL lifecycle owner)
+  lib/             photoStore.js — IndexedDB + canvas shrink/re-encode
+  experiences/     the 13 joy experiences + the pool registry (index.js)
   components/
-    calm/          CalmToolkit, BreathingExercise, GroundingExercise
-    Companion.jsx  the growing sprout
+    calm/               CalmToolkit, BreathingExercise, GroundingExercise
+    ExperienceMenu.jsx  the animated menu + saved-memory panel
+    Companion.jsx       the growing sprout
   config/          personal.example.json (committed) + loader
   constants/       the z-index layer scale
 scripts/           dependency-free PWA icon generator
@@ -162,12 +224,12 @@ scripts/           dependency-free PWA icon generator
 ## Status
 
 **Phase 1 (MVP) — complete.** Installable offline-first PWA shell, rotation engine
-with tests, Calm Toolkit, four joy experiences (compliment slot machine, gratitude
-prompt, doodle pad, memory wall), and the growing companion.
+with tests, Calm Toolkit, the growing companion.
 
-**Phase 2 — not started.** Full Birthday Mode sequence (the `isBirthday` flag is
-already wired and changes the greeting), pool expanded to 10-12 experiences, discrete
-companion growth stages, theme picker.
+**Phase 2 — mostly complete.** Pool expanded to 13 experiences, animated menu with a
+saved-memory panel, device-side photo storage, rotating pet-name greeting. Still open:
+the full Birthday Mode sequence (the `isBirthday` flag is already wired and changes the
+greeting), discrete companion growth stages, theme picker.
 
 **Phase 3 — not started.** Ambient soundscapes, custom install prompt, full
 accessibility pass, optional gentle local notification.

@@ -20,5 +20,9 @@ public/workbox-*.js
 # Copy src/config/personal.example.json -> src/config/personal.json and edit.
 # ---------------------------------------------------------------------------
 src/config/personal.json
+
+# Photos are added in-app and stored in IndexedDB, so nothing should ever land in
+# these folders. Kept ignored anyway: this repo is public, and a stray drag-and-drop
+# of a personal photo into public/ must not be commit-able by accident.
 public/memories/
 public/voice/

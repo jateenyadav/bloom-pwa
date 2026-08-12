@@ -15,7 +15,16 @@ export const LAYER = {
   BACKDROP: -10,
   /** Fullscreen views opened from inside an experience. */
   EXPERIENCE_OVERLAY: 40,
-  /** The floating calm button — above every experience. */
+  /**
+   * The menu button and its drawer.
+   *
+   * Above experience overlays so the menu is always openable, but deliberately
+   * BELOW the calm trigger: with the menu open, the calm button must still be
+   * sitting on top of it, one tap away. The menu is a convenience; calm is a
+   * guarantee.
+   */
+  MENU: 45,
+  /** The floating calm button — above every experience and the menu. */
   CALM_TRIGGER: 50,
   /** The calm toolkit overlay itself — above everything. */
   CALM_OVERLAY: 60,

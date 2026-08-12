@@ -8,13 +8,16 @@
  * so it is reachable in one tap no matter which experience is on screen or what
  * that experience is doing.
  */
+import { useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import CalmToolkit from './components/calm/CalmToolkit.jsx'
 import Companion from './components/Companion.jsx'
+import ExperienceMenu from './components/ExperienceMenu.jsx'
 import WorldBackground from './components/world/WorldBackground.jsx'
 import { useDailyExperience } from './hooks/useDailyExperience.js'
 import { usePetName } from './hooks/usePetName.js'
 import { capitalize } from './engine/petNames.js'
+import { experiencePool } from './experiences/index.js'
 import { config, isPersonalized } from './config/index.js'
 
 function timeGreeting(date = new Date()) {
@@ -37,8 +40,16 @@ const TEASERS = [
 
 export default function App() {
   const reduceMotion = useReducedMotion()
-  const { experience, isBirthday } = useDailyExperience()
+  const { experience: dailyExperience, isBirthday } = useDailyExperience()
   const petName = usePetName()
+
+  // A menu pick overrides today's rotation for this visit only. Deliberately not
+  // persisted: the rotation state has already advanced, so tomorrow still brings
+  // something new — browsing the menu can't derail the daily surprise.
+  const [chosenId, setChosenId] = useState(null)
+  const experience = chosenId
+    ? (experiencePool.find((entry) => entry.id === chosenId) ?? dailyExperience)
+    : dailyExperience
 
   const Experience = experience?.component
   // Tie the teaser to the experience id so it's stable for this visit.
@@ -110,7 +121,9 @@ export default function App() {
             {isBirthday
               ? // Phase 2 replaces this with the full Birthday Mode sequence.
                 '🎂 something tells me today is a special one'
-              : teaser}
+              : chosenId
+                ? 'from the menu, just for you'
+                : teaser}
           </motion.p>
         </motion.div>
       </header>
@@ -153,6 +166,13 @@ export default function App() {
         </motion.p>
       )}
 
+      {/*
+        Both floating controls are mounted here at the root, never inside an
+        experience. Their stacking is the point: the menu is z-45, the calm trigger
+        z-50, so even with the menu drawer wide open the calm button is on top of it
+        and still one tap away. See src/constants/layers.js.
+      */}
+      <ExperienceMenu currentId={experience?.id ?? null} onPick={setChosenId} />
       <CalmToolkit />
     </div>
   )

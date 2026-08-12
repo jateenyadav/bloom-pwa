@@ -37,6 +37,13 @@ export const config = {
   birthdayDate: merged.birthdayDate,
   compliments: merged.compliments,
   gratitudePrompts: merged.gratitudePrompts,
+  /** Short lines for the fortune cookie. See experiences/FortuneCookie.jsx. */
+  fortunes: merged.fortunes,
+  /**
+   * Caption-only gradient cards for the memory wall. Real photos are added from
+   * the device at runtime and stored in IndexedDB — never in the repo, which is
+   * public. See lib/photoStore.js.
+   */
   memories: merged.memories,
   /** Affectionate nicknames, rotated one per open. See engine/petNames.js. */
   petNames: merged.petNames,

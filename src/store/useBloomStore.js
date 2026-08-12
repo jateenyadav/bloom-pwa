@@ -31,6 +31,22 @@ const initialState = {
   lastBirthdayShown: null,
   /** Shuffle-bag state for the pet-name greeting. See engine/petNames.js. */
   petName: createInitialPetNameState(),
+
+  // --- Per-experience saved memory -----------------------------------------
+  // Each experience that remembers anything owns exactly one key here, so the
+  // menu can report "you have N of these" without knowing how any of them work.
+  /** Wish Jar: { id, text, createdAt }. */
+  wishes: [],
+  /** Mood Garden: { id, mood, dayKey, createdAt }. One flower per entry. */
+  moods: [],
+  /** Time Capsule: { id, text, createdAt, unlockAt, opened }. */
+  capsules: [],
+  /** Hug Button: a running total. The only number here that's meant to be shown off. */
+  hugs: 0,
+  /** Bubble Pop: lifetime bubbles popped. Purely for fun. */
+  bubblesPopped: 0,
+  /** Sticker Book: ids of stickers found so far. */
+  stickers: [],
 }
 
 export const useBloomStore = create(
@@ -85,6 +101,84 @@ export const useBloomStore = create(
         set((state) => ({ gratitude: state.gratitude.filter((entry) => entry.id !== id) }))
       },
 
+      // --- Wish Jar ----------------------------------------------------------
+      addWish(text, now = new Date()) {
+        const trimmed = text.trim()
+        if (!trimmed) return
+        set((state) => ({
+          wishes: [
+            ...state.wishes,
+            { id: `w-${now.getTime()}-${state.wishes.length}`, text: trimmed, createdAt: now.toISOString() },
+          ],
+        }))
+      },
+
+      removeWish(id) {
+        set((state) => ({ wishes: state.wishes.filter((wish) => wish.id !== id) }))
+      },
+
+      // --- Mood Garden -------------------------------------------------------
+      /**
+       * Plant today's mood. One flower per day: planting again on the same day
+       * replaces it rather than stacking, so the garden reads as a calendar and
+       * changing your mind costs nothing.
+       */
+      setMood(mood, now = new Date()) {
+        const dayKey = toDayKey(now)
+        set((state) => ({
+          moods: [
+            ...state.moods.filter((entry) => entry.dayKey !== dayKey),
+            { id: `m-${dayKey}`, mood, dayKey, createdAt: now.toISOString() },
+          ],
+        }))
+      },
+
+      // --- Time Capsule ------------------------------------------------------
+      /** Write a note to your future self, sealed for `days`. */
+      addCapsule(text, days = 7, now = new Date()) {
+        const trimmed = text.trim()
+        if (!trimmed) return
+        const unlockAt = new Date(now.getTime() + days * 86400000)
+        set((state) => ({
+          capsules: [
+            ...state.capsules,
+            {
+              id: `c-${now.getTime()}-${state.capsules.length}`,
+              text: trimmed,
+              createdAt: now.toISOString(),
+              unlockAt: unlockAt.toISOString(),
+              opened: false,
+            },
+          ],
+        }))
+      },
+
+      openCapsule(id) {
+        set((state) => ({
+          capsules: state.capsules.map((c) => (c.id === id ? { ...c, opened: true } : c)),
+        }))
+      },
+
+      removeCapsule(id) {
+        set((state) => ({ capsules: state.capsules.filter((c) => c.id !== id) }))
+      },
+
+      // --- Small counters ----------------------------------------------------
+      addHug() {
+        set((state) => ({ hugs: state.hugs + 1 }))
+      },
+
+      addBubbles(count = 1) {
+        set((state) => ({ bubblesPopped: state.bubblesPopped + count }))
+      },
+
+      /** Record a found sticker. Idempotent — finding it twice isn't a second one. */
+      findSticker(id) {
+        set((state) =>
+          state.stickers.includes(id) ? state : { stickers: [...state.stickers, id] }
+        )
+      },
+
       markBirthdayShown(now = new Date()) {
         set({ lastBirthdayShown: toDayKey(now) })
       },
@@ -97,6 +191,10 @@ export const useBloomStore = create(
           petName: createInitialPetNameState(),
           openDays: [],
           gratitude: [],
+          wishes: [],
+          moods: [],
+          capsules: [],
+          stickers: [],
         })
       },
     }),
@@ -111,6 +209,12 @@ export const useBloomStore = create(
         gratitude: state.gratitude,
         lastBirthdayShown: state.lastBirthdayShown,
         petName: state.petName,
+        wishes: state.wishes,
+        moods: state.moods,
+        capsules: state.capsules,
+        hugs: state.hugs,
+        bubblesPopped: state.bubblesPopped,
+        stickers: state.stickers,
       }),
     }
   )

@@ -44,39 +44,43 @@
     "What's one thing you'd tell your past self about right now?"
   ],
 
+  "$comment_fortunes": "Short lines for the fortune cookie. Keep them fortune-shaped — a nudge or a small prediction rather than a compliment, since the slot machine and scratch card already cover compliments.",
+  "fortunes": [
+    "Something you've been dreading will turn out to be fine.",
+    "A small kindness you did is still travelling.",
+    "The thing you're waiting on is closer than it looks.",
+    "Say yes to the next small invitation.",
+    "You will be very glad you rested today.",
+    "An old worry is about to quietly expire.",
+    "Someone is about to be very happy to hear from you.",
+    "The answer arrives once you stop chasing it.",
+    "Today is allowed to be an ordinary day.",
+    "A good thing is coming that you didn't plan for."
+  ],
+
+  "$comment_memories": "Caption-only cards for the memory wall, shown before you have added photos. Real photos are added inside the app from your device and are stored on that device only — never put image files in this repo, it is public.",
   "memories": [
     {
       "id": "m1",
-      "caption": "A placeholder memory. Drop your own photo in public/memories/ and point at it here.",
-      "image": null,
+      "caption": "Tap 'Add a photo' on the wall to put your own pictures here.",
       "gradient": ["#e8a9a0", "#e5bd72"],
       "date": "Some good day"
     },
     {
       "id": "m2",
-      "caption": "Captions can be as long or as short as you like.",
-      "image": null,
+      "caption": "Photos you add stay on your device — they are never uploaded.",
       "gradient": ["#9dbcd4", "#5b8c5a"],
       "date": "That one afternoon"
     },
     {
       "id": "m3",
-      "caption": "If image is null, Bloom draws a soft gradient card instead.",
-      "image": null,
+      "caption": "Captions can be as long or as short as you like.",
       "gradient": ["#5b8c5a", "#e5bd72"],
       "date": "Ordinary Tuesday"
     },
     {
       "id": "m4",
-      "caption": "Add as many as you want — the wall just keeps scrolling.",
-      "image": null,
-      "gradient": ["#e5bd72", "#e8a9a0"],
-      "date": "Later that year"
-    },
-    {
-      "id": "m5",
       "caption": "The small days are the ones worth keeping.",
-      "image": null,
       "gradient": ["#9dbcd4", "#e8a9a0"],
       "date": "No idea, but it was nice"
     }
