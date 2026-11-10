@@ -17,6 +17,10 @@ No backend, no accounts, no analytics, no tracking. Everything lives on the devi
 **Live demo:** https://jateenyadav.github.io/bloom-pwa/ — running on the generic
 placeholder content, since the personal config is gitignored and never reaches CI.
 
+[![Bloom demo: daily joy, bubble wrap, fortune cookie, breathing](docs/demo.gif)](docs/demo.mp4)
+
+▶ [Watch the full 18-second demo with sound](docs/demo.mp4)
+
 **This repo is deliberately generic.** There are no names, photos, or personal
 messages in the committed code — all of that comes from a single gitignored config
 file. Fork it and make it about your person.
